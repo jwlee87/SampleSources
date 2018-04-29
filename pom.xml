@@ -8,13 +8,13 @@
   <name>SampleSources Maven Webapp</name>
   <url>http://maven.apache.org</url>
   <dependencies>
-  	<!-- Junit -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
+  	<!-- https://mvnrepository.com/artifact/junit/junit -->
+	<dependency>
+	    <groupId>junit</groupId>
+	    <artifactId>junit</artifactId>
+	    <version>4.12</version>
+	    <scope>test</scope>
+	</dependency>
     
 	<!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
 	<dependency>
@@ -31,7 +31,19 @@
 	    <version>3.1.0</version>
 	    <scope>provided</scope>
 	</dependency>
-    
+	
+	<dependency>
+	    <groupId>org.apache.httpcomponents</groupId>
+	    <artifactId>httpclient</artifactId>
+	    <version>4.3.2</version>
+	</dependency>
+ 
+	<dependency>
+	    <groupId>org.apache.httpcomponents</groupId>
+	    <artifactId>httpmime</artifactId>
+	    <version>4.3.2</version>
+	</dependency>
+
   </dependencies>
   <build>
     <finalName>SampleSources</finalName>
