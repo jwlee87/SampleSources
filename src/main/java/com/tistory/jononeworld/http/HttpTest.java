@@ -2,12 +2,21 @@ package com.tistory.jononeworld.http;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.config.RequestConfig.Builder;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
@@ -16,6 +25,8 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 
 public class HttpTest {
 	
@@ -146,6 +157,61 @@ public class HttpTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private String getHttpPostData(String url, Map<String,String> paramMap) {
+		String responseBody = "";
+		try {
+			CloseableHttpClient httpclient = HttpClients.createDefault();
+			Builder builder = RequestConfig.custom();
+			builder.setConnectTimeout(4000);
+			builder.setSocketTimeout(4000);
+			builder.setStaleConnectionCheckEnabled(false);
+			RequestConfig config = builder.build();
+
+			try {
+				HttpPost httpPost = new HttpPost(url);
+				ArrayList<NameValuePair> postParams = new ArrayList<NameValuePair>();
+				for (Map.Entry<String, String> entry: paramMap.entrySet()) {
+					postParams.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+				}
+				httpPost.setEntity(new UrlEncodedFormEntity(postParams));
+				httpPost.setConfig(config);
+
+				System.out.println("url : " + url);
+				System.out.println("Executing request " + httpPost.getRequestLine());
+	 
+				// Create a custom response handler
+				ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
+					@Override
+					public String handleResponse(
+						final HttpResponse response) throws ClientProtocolException, IOException {
+						int status = response.getStatusLine().getStatusCode();
+						if (status >= 200 && status < 300) {
+							HttpEntity entity = response.getEntity();
+							String responseStr = "";
+							if( entity != null ) {
+								responseStr = EntityUtils.toString(entity);
+							}
+							return responseStr;
+						} else {
+							throw new ClientProtocolException("Unexpected response status: " + status);
+						}
+					}
+				};
+				responseBody = httpclient.execute(httpPost, responseHandler);
+
+				System.out.println("----------------------------------------");
+				System.out.println(responseBody);
+
+			} finally {
+				httpclient.close();
+			}
+
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return responseBody;
 	}
 
 }
